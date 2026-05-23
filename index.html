@@ -9,318 +9,213 @@
   <title>Camila's PA</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: 'Georgia', 'Times New Roman', serif;
       background: #f8f6f2;
       min-height: 100vh;
-      min-height: -webkit-fill-available;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      display: flex; flex-direction: column; align-items: center;
     }
-
     #app {
-      width: 100%;
-      max-width: 480px;
+      width: 100%; max-width: 480px;
       min-height: 100vh;
-      min-height: -webkit-fill-available;
-      display: flex;
-      flex-direction: column;
-      position: relative;
+      display: flex; flex-direction: column;
       background: #f8f6f2;
+      position: relative;
     }
 
-    /* ── HEADER ── */
+    /* HEADER */
     #header {
       background: #1a1a1a;
-      padding: 52px 20px 14px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      padding: 52px 20px 0;
+      position: sticky; top: 0; z-index: 10;
     }
-
+    #header-top { display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; }
     #header-title { color: #f8f6f2; font-size: 18px; font-weight: 400; letter-spacing: 0.04em; }
     #header-sub { color: #888; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 2px; }
-
+    #tab-bar { display: flex; border-top: 1px solid #2a2a2a; }
     .tab-btn {
-      background: transparent;
-      color: #888;
-      border: 1px solid #444;
-      border-radius: 20px;
-      padding: 5px 14px;
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      cursor: pointer;
-      font-family: inherit;
+      flex: 1; background: transparent; color: #666;
+      border: none; border-bottom: 2px solid transparent;
+      padding: 10px 4px; font-size: 11px; letter-spacing: 0.1em;
+      text-transform: uppercase; cursor: pointer; font-family: inherit;
       transition: all 0.2s;
-      margin-left: 6px;
     }
-    .tab-btn.active {
-      background: #f8f6f2;
-      color: #1a1a1a;
-      border-color: #f8f6f2;
-    }
+    .tab-btn.active { color: #f8f6f2; border-bottom-color: #f8f6f2; }
 
-    /* ── API KEY SCREEN ── */
+    /* API SCREEN */
     #api-screen {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 24px;
-      text-align: center;
+      flex: 1; display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 40px 24px; text-align: center;
     }
     #api-screen .icon { font-size: 36px; margin-bottom: 20px; color: #bbb; }
     #api-screen h2 { font-size: 18px; font-weight: 400; color: #1a1a1a; margin-bottom: 10px; }
     #api-screen p { font-size: 13px; color: #888; line-height: 1.6; margin-bottom: 24px; }
     #api-screen a { color: #1a1a1a; }
     #api-input {
-      width: 100%;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      padding: 12px 16px;
-      font-size: 13px;
-      font-family: monospace;
-      background: #fff;
-      color: #1a1a1a;
-      outline: none;
-      margin-bottom: 12px;
+      width: 100%; border: 1px solid #ddd; border-radius: 12px;
+      padding: 12px 16px; font-size: 13px; font-family: monospace;
+      background: #fff; color: #1a1a1a; outline: none; margin-bottom: 12px;
     }
     #api-save-btn {
-      width: 100%;
-      background: #1a1a1a;
-      color: #f8f6f2;
-      border: none;
-      border-radius: 12px;
-      padding: 13px;
-      font-size: 14px;
-      font-family: inherit;
-      cursor: pointer;
-      letter-spacing: 0.04em;
+      width: 100%; background: #1a1a1a; color: #f8f6f2;
+      border: none; border-radius: 12px; padding: 13px;
+      font-size: 14px; font-family: inherit; cursor: pointer;
     }
-    #api-note { font-size: 11px; color: #bbb; margin-top: 12px; line-height: 1.5; }
 
-    /* ── CHAT VIEW ── */
-    #chat-view {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px 16px 110px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    #chat-view.hidden, #dashboard-view.hidden { display: none; }
+    /* VIEWS */
+    .view { flex: 1; overflow-y: auto; display: none; }
+    .view.active { display: flex; flex-direction: column; }
 
+    /* CHAT */
+    #chat-view { padding: 20px 16px 120px; gap: 12px; }
     .msg-wrap { display: flex; flex-direction: column; }
     .msg-wrap.user { align-items: flex-end; }
     .msg-wrap.assistant { align-items: flex-start; }
-
-    .msg-cat-label {
-      font-size: 10px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      margin-bottom: 3px;
-      padding-left: 4px;
-    }
-
+    .msg-tag { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 3px; padding: 0 4px; }
     .msg-bubble {
-      border-radius: 18px;
-      padding: 10px 14px;
-      max-width: 80%;
-      font-size: 14px;
-      line-height: 1.5;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      border-radius: 18px; padding: 10px 14px; max-width: 82%;
+      font-size: 14px; line-height: 1.5; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
     }
-    .msg-bubble.user {
-      background: #1a1a1a;
-      color: #f8f6f2;
-      border-radius: 18px 18px 4px 18px;
-    }
-    .msg-bubble.assistant {
-      background: #fff;
-      color: #1a1a1a;
-      border: 1px solid #eee;
-      border-radius: 18px 18px 18px 4px;
-    }
-
-    .msg-time {
-      font-size: 10px;
-      color: #bbb;
-      margin-top: 3px;
-      padding: 0 4px;
-    }
-
-    /* Typing indicator */
-    #typing {
-      display: none;
-      align-items: flex-start;
-    }
+    .msg-bubble.user { background: #1a1a1a; color: #f8f6f2; border-radius: 18px 18px 4px 18px; }
+    .msg-bubble.assistant { background: #fff; color: #1a1a1a; border: 1px solid #eee; border-radius: 18px 18px 18px 4px; }
+    .msg-time { font-size: 10px; color: #bbb; margin-top: 3px; padding: 0 4px; }
+    #typing { display: none; align-items: flex-start; }
     #typing.visible { display: flex; }
-    .typing-bubble {
-      background: #fff;
-      border: 1px solid #eee;
-      border-radius: 18px 18px 18px 4px;
-      padding: 10px 16px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-      display: flex;
-      gap: 4px;
-      align-items: center;
-    }
-    .dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: #ccc;
-      animation: pulse 1.2s ease-in-out infinite;
-    }
+    .typing-bubble { background: #fff; border: 1px solid #eee; border-radius: 18px 18px 18px 4px; padding: 10px 16px; display: flex; gap: 4px; align-items: center; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: #ccc; animation: pulse 1.2s ease-in-out infinite; }
     .dot:nth-child(2) { animation-delay: 0.2s; }
     .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse { 0%,100%{opacity:.3;transform:scale(.8)} 50%{opacity:1;transform:scale(1)} }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 0.3; transform: scale(0.8); }
-      50% { opacity: 1; transform: scale(1); }
+    /* TAG QUICK BAR */
+    #tag-bar {
+      position: fixed; bottom: 70px;
+      left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 480px;
+      padding: 6px 12px;
+      display: none; gap: 6px; overflow-x: auto;
+      background: #f8f6f2; border-top: 1px solid #eee;
+      -webkit-overflow-scrolling: touch;
     }
+    #tag-bar.visible { display: flex; }
+    #tag-bar::-webkit-scrollbar { display: none; }
+    .tag-chip {
+      flex-shrink: 0; background: #fff; border: 1px solid #ddd;
+      border-radius: 20px; padding: 4px 10px; font-size: 11px;
+      color: #555; cursor: pointer; font-family: inherit;
+      white-space: nowrap; transition: all 0.15s;
+    }
+    .tag-chip:active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
 
-    /* ── INPUT BAR ── */
+    /* INPUT BAR */
     #input-bar {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 480px;
-      background: #fff;
-      border-top: 1px solid #eee;
-      padding: 12px 16px 28px;
-      display: flex;
-      gap: 10px;
-      align-items: flex-end;
-      z-index: 10;
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 480px;
+      background: #fff; border-top: 1px solid #eee;
+      padding: 8px 12px 24px; display: none; gap: 8px; align-items: flex-end; z-index: 10;
     }
     #msg-input {
-      flex: 1;
-      border: 1px solid #ddd;
-      border-radius: 20px;
-      padding: 10px 16px;
-      font-size: 14px;
-      font-family: inherit;
-      resize: none;
-      outline: none;
-      line-height: 1.4;
-      background: #f8f6f2;
-      color: #1a1a1a;
-      max-height: 100px;
-      overflow-y: auto;
+      flex: 1; border: 1px solid #ddd; border-radius: 20px;
+      padding: 9px 14px; font-size: 14px; font-family: inherit;
+      resize: none; outline: none; line-height: 1.4;
+      background: #f8f6f2; color: #1a1a1a; max-height: 100px; overflow-y: auto;
     }
     #send-btn {
-      background: #ddd;
-      color: #fff;
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      font-size: 16px;
-      cursor: default;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: background 0.2s;
+      background: #ddd; color: #fff; border: none; border-radius: 50%;
+      width: 38px; height: 38px; font-size: 16px; cursor: default;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background 0.2s;
     }
-    #send-btn.ready {
-      background: #1a1a1a;
-      cursor: pointer;
-    }
+    #send-btn.ready { background: #1a1a1a; cursor: pointer; }
 
-    /* ── DASHBOARD ── */
-    #dashboard-view {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px 16px 40px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
+    /* DASHBOARD */
+    #dashboard-view { padding: 16px 16px 40px; gap: 14px; }
+    .date-label { font-size: 11px; color: #999; letter-spacing: 0.12em; text-transform: uppercase; }
 
-    .date-label {
-      font-size: 11px;
-      color: #999;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
+    /* Today summary */
+    .today-summary {
+      background: #1a1a1a; border-radius: 16px; padding: 18px;
+      display: flex; flex-direction: column; gap: 10px;
     }
+    .today-label { font-size: 10px; color: #666; letter-spacing: 0.12em; text-transform: uppercase; }
+    .today-title { font-size: 16px; color: #f8f6f2; font-weight: 400; }
+    .today-stats { display: flex; gap: 16px; margin-top: 4px; }
+    .today-stat { font-size: 12px; color: #888; }
+    .today-stat span { color: #f8f6f2; }
+    .today-entries { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+    .today-entry-item {
+      display: flex; justify-content: space-between; align-items: center;
+      background: #252525; border-radius: 8px; padding: 8px 12px;
+    }
+    .today-entry-text { font-size: 13px; color: #ccc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+    .today-entry-meta { font-size: 11px; color: #666; margin-left: 8px; flex-shrink: 0; }
+    .today-empty { font-size: 12px; color: #555; text-align: center; padding: 8px; }
 
-    .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    /* Finance */
+    .fin-header { display: flex; justify-content: space-between; align-items: center; }
+    .fin-month-nav { display: flex; align-items: center; gap: 8px; }
+    .fin-month-btn { background: none; border: none; color: #888; font-size: 16px; cursor: pointer; padding: 4px; }
+    .fin-month-label { font-size: 12px; color: #555; min-width: 80px; text-align: center; }
+    .fin-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
+    .fin-card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 12px 10px; text-align: center; }
+    .fin-card-label { font-size: 9px; color: #aaa; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
+    .fin-card-val { font-size: 14px; font-weight: 400; }
+    .fin-chart { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+    .fin-bar-row { display: flex; align-items: center; gap: 8px; }
+    .fin-bar-label { font-size: 11px; color: #888; width: 90px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fin-bar-track { flex: 1; background: #f0f0f0; border-radius: 4px; height: 8px; overflow: hidden; }
+    .fin-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s; }
+    .fin-bar-val { font-size: 11px; color: #888; width: 60px; text-align: right; flex-shrink: 0; }
+    .fin-cat-filter { display: flex; gap: 6px; overflow-x: auto; margin-top: 10px; padding-bottom: 4px; }
+    .fin-cat-filter::-webkit-scrollbar { display: none; }
+    .fin-cat-chip {
+      flex-shrink: 0; background: #fff; border: 1px solid #ddd;
+      border-radius: 20px; padding: 4px 10px; font-size: 11px;
+      color: #888; cursor: pointer; font-family: inherit; transition: all 0.15s;
+    }
+    .fin-cat-chip.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
 
-    .card {
-      background: #fff;
-      border: 1px solid #eee;
-      border-radius: 16px;
-      padding: 16px 18px;
-    }
-    .card-label {
-      font-size: 10px;
-      color: #999;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-    .card-value { font-size: 22px; font-weight: 400; }
-    .card-sub { font-size: 11px; color: #bbb; margin-top: 4px; }
-
-    .stat-card {
-      background: #fff;
-      border: 1px solid #eee;
-      border-radius: 14px;
-      padding: 14px 12px;
-      text-align: center;
-    }
-    .stat-num { font-size: 24px; font-weight: 400; }
-    .stat-label { font-size: 10px; color: #aaa; margin-top: 4px; letter-spacing: 0.08em; }
-
-    .section {
-      background: #fff;
-      border: 1px solid #eee;
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    .section-header {
-      padding: 12px 18px 10px;
-      border-bottom: 1px solid #f0f0f0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    /* Sections */
+    .section { background: #fff; border: 1px solid #eee; border-radius: 16px; overflow: hidden; }
+    .section-header { padding: 12px 16px 10px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; }
+    .section-header-left { display: flex; align-items: center; gap: 8px; }
     .section-icon { font-size: 13px; }
     .section-title { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #888; }
-
-    .entry-row {
-      padding: 10px 18px;
-      border-bottom: 1px solid #fafafa;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .section-filter { display: flex; gap: 4px; overflow-x: auto; }
+    .section-filter::-webkit-scrollbar { display: none; }
+    .s-chip {
+      flex-shrink: 0; background: #f5f5f5; border: none;
+      border-radius: 20px; padding: 3px 8px; font-size: 10px;
+      color: #888; cursor: pointer; font-family: inherit; transition: all 0.15s;
     }
+    .s-chip.active { background: #1a1a1a; color: #fff; }
+    .entry-row { padding: 10px 16px; border-bottom: 1px solid #fafafa; display: flex; justify-content: space-between; align-items: center; }
     .entry-row:last-child { border-bottom: none; }
+    .entry-left { flex: 1; min-width: 0; }
     .entry-title { font-size: 13px; color: #1a1a1a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .entry-summary { font-size: 11px; color: #aaa; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .entry-right { text-align: right; flex-shrink: 0; margin-left: 12px; }
-    .entry-value { font-size: 13px; color: #c0392b; }
+    .entry-right { text-align: right; flex-shrink: 0; margin-left: 10px; }
+    .entry-value { font-size: 13px; }
     .entry-date { font-size: 11px; color: #1a6b4a; }
-    .entry-icon { font-size: 10px; letter-spacing: 0.08em; }
+    .entry-tag { font-size: 10px; letter-spacing: 0.06em; margin-top: 2px; }
 
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: #ccc;
+    .empty-state { text-align: center; padding: 40px 20px; color: #ccc; }
+    .empty-icon { font-size: 28px; margin-bottom: 8px; }
+    .empty-text { font-size: 12px; letter-spacing: 0.06em; line-height: 1.6; }
+
+    /* HISTORY VIEW */
+    #history-view { padding: 16px 16px 40px; gap: 14px; }
+    .hist-filter-bar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+    .hist-filter-bar::-webkit-scrollbar { display: none; }
+    .hist-chip {
+      flex-shrink: 0; background: #fff; border: 1px solid #ddd;
+      border-radius: 20px; padding: 5px 12px; font-size: 11px;
+      color: #888; cursor: pointer; font-family: inherit; transition: all 0.15s;
     }
-    .empty-icon { font-size: 32px; margin-bottom: 12px; }
-    .empty-text { font-size: 13px; letter-spacing: 0.06em; line-height: 1.6; }
+    .hist-chip.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+    .hist-type-bar { display: flex; gap: 6px; overflow-x: auto; }
+    .hist-type-bar::-webkit-scrollbar { display: none; }
 
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -332,376 +227,555 @@
 
   <!-- HEADER -->
   <div id="header">
-    <div>
-      <div id="header-title">Camila's PA</div>
-      <div id="header-sub">Personal Assistant</div>
+    <div id="header-top">
+      <div>
+        <div id="header-title">Camila's PA</div>
+        <div id="header-sub">Personal Assistant</div>
+      </div>
     </div>
-    <div>
+    <div id="tab-bar">
       <button class="tab-btn active" onclick="switchView('chat')">Chat</button>
       <button class="tab-btn" onclick="switchView('dashboard')">Painel</button>
+      <button class="tab-btn" onclick="switchView('history')">Histórico</button>
     </div>
   </div>
 
   <!-- API KEY SCREEN -->
-  <div id="api-screen" style="display:none;">
+  <div id="api-screen">
     <div class="icon">⚿</div>
     <h2>Configurar assistente</h2>
     <p>Para funcionar, o app precisa da sua chave de API da Anthropic. Ela fica salva apenas no seu celular.<br><br>
-    Obtenha a sua em <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
+    Obtenha em <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
     <input type="password" id="api-input" placeholder="sk-ant-..." />
     <button id="api-save-btn" onclick="saveApiKey()">Salvar e começar →</button>
-    <div id="api-note">A chave é armazenada localmente no seu dispositivo e nunca compartilhada.</div>
   </div>
 
   <!-- CHAT VIEW -->
-  <div id="chat-view" class="hidden">
+  <div id="chat-view" class="view">
     <div id="typing">
       <div class="typing-bubble">
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
       </div>
     </div>
   </div>
 
   <!-- DASHBOARD VIEW -->
-  <div id="dashboard-view" class="hidden">
-  </div>
+  <div id="dashboard-view" class="view"></div>
 
-  <!-- INPUT BAR (only in chat) -->
-  <div id="input-bar" style="display:none;">
-    <textarea id="msg-input" rows="1" placeholder="Gastei 80 reais no jantar… reunião às 15h… percebi que…" oninput="onInputChange(this)" onkeydown="onKeyDown(event)"></textarea>
+  <!-- HISTORY VIEW -->
+  <div id="history-view" class="view"></div>
+
+  <!-- TAG QUICK BAR -->
+  <div id="tag-bar"></div>
+
+  <!-- INPUT BAR -->
+  <div id="input-bar">
+    <textarea id="msg-input" rows="1"
+      placeholder="Ex: #alimentação gastei 45 no almoço"
+      oninput="onInputChange(this)" onkeydown="onKeyDown(event)"></textarea>
     <button id="send-btn" onclick="send()">→</button>
   </div>
 
 </div>
-
 <script>
-  const CATEGORIES = {
-    gasto:       { label: "Gasto",        color: "#c0392b", icon: "↓" },
-    nota:        { label: "Nota",         color: "#2c3e50", icon: "✎" },
-    insight:     { label: "Insight",      color: "#8e6bbf", icon: "◈" },
-    compromisso: { label: "Compromisso",  color: "#1a6b4a", icon: "◷" },
-  };
+// ── CONFIG ──
+const TAGS = {
+  gasto: {
+    label: 'Gastos', icon: '↓', color: '#c0392b',
+    cats: ['#alimentação','#transporte','#moradia','#saúde','#trabalho','#lazer','#compras','#educação','#outros']
+  },
+  credito: {
+    label: 'Créditos', icon: '↑', color: '#1a6b4a',
+    cats: ['#salário','#freelance','#investimento','#reembolso','#outros']
+  },
+  compromisso: {
+    label: 'Compromissos', icon: '◷', color: '#1a6b4a',
+    cats: ['#trabalho','#pessoal','#saúde','#financeiro','#outros']
+  },
+  insight: {
+    label: 'Insights', icon: '◈', color: '#8e6bbf',
+    cats: ['#trabalho','#mercado','#pessoal','#ideia','#aprendizado','#outros']
+  },
+  nota: {
+    label: 'Notas', icon: '✎', color: '#2c3e50',
+    cats: ['#trabalho','#pessoal','#lembrete','#pesquisa','#outros']
+  }
+};
 
-  const SYSTEM_PROMPT = `Você é um assistente pessoal minimalista e inteligente chamado "Camila's Personal Assistant". Você processa mensagens curtas do usuário e classifica cada uma em uma das quatro categorias: gasto, nota, insight ou compromisso.
+const ALL_TAGS = [...TAGS.gasto.cats, ...TAGS.credito.cats.filter(t=>!TAGS.gasto.cats.includes(t)),
+  '#trabalho','#pessoal','#saúde','#financeiro','#mercado','#ideia','#aprendizado','#lembrete','#pesquisa'];
+const UNIQUE_TAGS = [...new Set(ALL_TAGS)];
 
-Para cada mensagem, responda APENAS com JSON válido neste formato exato:
+const SYSTEM_PROMPT = `Você é um assistente pessoal chamado "Camila's PA". Processe a mensagem e retorne APENAS JSON válido:
 {
-  "category": "gasto" | "nota" | "insight" | "compromisso",
-  "title": "título curto (máx 40 chars)",
+  "type": "gasto"|"credito"|"compromisso"|"insight"|"nota",
+  "tag": "a tag usada (ex: #alimentação) ou a mais adequada se não informada",
+  "title": "título curto máx 40 chars",
   "summary": "resumo em 1 linha",
-  "value": número ou null (apenas para gastos, em reais),
-  "date": "YYYY-MM-DD" ou null (apenas para compromissos),
-  "time": "HH:MM" ou null (apenas para compromissos),
-  "reply": "resposta natural e breve para o usuário (1-2 frases, tom direto e cálido)"
+  "value": número ou null (para gastos e créditos em reais),
+  "date": "YYYY-MM-DD" ou null (compromissos),
+  "time": "HH:MM" ou null (compromissos),
+  "reply": "resposta breve e cálida ao usuário (1-2 frases)"
 }
 
-Exemplos:
-- "Gastei 45 reais no almoço" → category: gasto, value: 45
-- "Reunião com cliente sexta às 14h" → category: compromisso, date: próxima sexta, time: 14:00
-- "Preciso estudar mais sobre açúcar VHP" → category: nota
-- "Percebi que clientes do agro preferem contato direto" → category: insight
+Tipos: gasto (despesa), credito (entrada de dinheiro), compromisso (evento/reunião), insight (observação/aprendizado), nota (anotação/lembrete).
+Tags comuns para gastos: #alimentação #transporte #moradia #saúde #trabalho #lazer #compras #educação #outros
+Tags comuns para créditos: #salário #freelance #investimento #reembolso #outros
+Se a tag não for informada, infira a mais adequada. Nunca retorne texto fora do JSON.`;
 
-Seja preciso na classificação. Nunca retorne texto fora do JSON.`;
+let messages = [], entries = [], apiKey = '';
+let currentView = 'chat';
+let histTypeFilter = 'todos';
+let histTagFilter = 'todas';
+let finMonth = new Date().getMonth();
+let finYear = new Date().getFullYear();
+let finCatFilter = 'todas';
 
-  let messages = [];
-  let entries = [];
-  let currentView = 'chat';
-  let apiKey = '';
+function fmt(v) { return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v||0); }
+function fmtTime(ts) { return new Date(ts).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }
+function fmtDate(d) { if(!d) return ''; const [y,m,day]=d.split('-'); return `${day}/${m}`; }
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+function monthName(m) { return ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][m]; }
+function todayFullLabel() { return new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}); }
 
-  function fmt(val) {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
-  }
-  function fmtTime(ts) {
-    return new Date(ts).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  }
-  function fmtDate(d) {
-    if (!d) return '';
-    const [y, m, day] = d.split('-');
-    return `${day}/${m}`;
-  }
-  function todayStr() {
-    return new Date().toISOString().split('T')[0];
-  }
-  function todayLabel() {
-    return new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
-  }
+function saveEntries() { localStorage.setItem('camila_pa_entries_v2', JSON.stringify(entries)); }
 
-  // ── INIT ──
-  function init() {
-    apiKey = localStorage.getItem('camila_pa_key') || '';
-    const savedEntries = localStorage.getItem('camila_pa_entries');
-    if (savedEntries) entries = JSON.parse(savedEntries);
-
-    if (!apiKey) {
-      document.getElementById('api-screen').style.display = 'flex';
-      document.getElementById('input-bar').style.display = 'none';
-    } else {
-      startApp();
-    }
-  }
-
-  function saveApiKey() {
-    const val = document.getElementById('api-input').value.trim();
-    if (!val.startsWith('sk-')) {
-      alert('Chave inválida. Deve começar com sk-ant-...');
-      return;
-    }
-    localStorage.setItem('camila_pa_key', val);
-    apiKey = val;
-    document.getElementById('api-screen').style.display = 'none';
+function init() {
+  apiKey = localStorage.getItem('camila_pa_key') || '';
+  const saved = localStorage.getItem('camila_pa_entries_v2');
+  if (saved) entries = JSON.parse(saved);
+  if (!apiKey) {
+    document.getElementById('api-screen').style.display = 'flex';
+  } else {
     startApp();
   }
+}
 
-  function startApp() {
-    addWelcome();
-    switchView('chat');
-    document.getElementById('input-bar').style.display = 'flex';
-  }
+function saveApiKey() {
+  const val = document.getElementById('api-input').value.trim();
+  if (!val.startsWith('sk-')) { alert('Chave inválida. Deve começar com sk-'); return; }
+  localStorage.setItem('camila_pa_key', val);
+  apiKey = val;
+  document.getElementById('api-screen').style.display = 'none';
+  startApp();
+}
 
-  function addWelcome() {
-    if (messages.length === 0) {
-      messages.push({
-        id: 1,
-        role: 'assistant',
-        text: 'Olá, Camila! Sou seu assistente pessoal. Me conte seus gastos, compromissos, anotações ou insights — em linguagem natural, como você falaria no WhatsApp.',
-        ts: Date.now(),
-      });
-    }
-    renderChat();
-  }
-
-  // ── VIEWS ──
-  function switchView(view) {
-    currentView = view;
-    document.querySelectorAll('.tab-btn').forEach((b, i) => {
-      b.classList.toggle('active', (i === 0 && view === 'chat') || (i === 1 && view === 'dashboard'));
+function startApp() {
+  if (messages.length === 0) {
+    messages.push({
+      id: 1, role: 'assistant', ts: Date.now(),
+      text: 'Olá, Camila! Use tags antes das mensagens para organizar tudo. Ex: #alimentação gastei 80 no jantar · #reunião amanhã às 14h · #ideia percebi que clientes preferem contato direto. Digite # para ver as tags disponíveis.'
     });
-    const chatEl = document.getElementById('chat-view');
-    const dashEl = document.getElementById('dashboard-view');
-    const inputEl = document.getElementById('input-bar');
-
-    if (view === 'chat') {
-      chatEl.classList.remove('hidden');
-      dashEl.classList.add('hidden');
-      inputEl.style.display = 'flex';
-      scrollBottom();
-    } else {
-      chatEl.classList.add('hidden');
-      dashEl.classList.remove('hidden');
-      inputEl.style.display = 'none';
-      renderDashboard();
-    }
   }
+  switchView('chat');
+  document.getElementById('input-bar').style.display = 'flex';
+  renderChat();
+  renderTagBar();
+}
 
-  // ── CHAT ──
-  function renderChat() {
-    const container = document.getElementById('chat-view');
-    // Clear existing messages (keep typing indicator)
-    const typing = document.getElementById('typing');
-    container.innerHTML = '';
-    container.appendChild(typing);
+// ── VIEWS ──
+function switchView(view) {
+  currentView = view;
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['chat','dashboard','history'][i] === view);
+  });
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(view+'-view').classList.add('active');
 
-    messages.forEach(msg => {
-      const wrap = document.createElement('div');
-      wrap.className = `msg-wrap ${msg.role}`;
+  const tagBar = document.getElementById('tag-bar');
+  const inputBar = document.getElementById('input-bar');
 
-      if (msg.category) {
-        const cat = CATEGORIES[msg.category];
-        const label = document.createElement('div');
-        label.className = 'msg-cat-label';
-        label.style.color = cat.color;
-        label.textContent = `${cat.icon} ${cat.label}`;
-        wrap.appendChild(label);
-      }
+  if (view === 'chat') {
+    inputBar.style.display = 'flex';
+    tagBar.classList.add('visible');
+    scrollBottom();
+  } else {
+    inputBar.style.display = 'none';
+    tagBar.classList.remove('visible');
+    if (view === 'dashboard') renderDashboard();
+    if (view === 'history') renderHistory();
+  }
+}
 
-      const bubble = document.createElement('div');
-      bubble.className = `msg-bubble ${msg.role}`;
-      bubble.textContent = msg.text;
-      wrap.appendChild(bubble);
+// ── CHAT ──
+function renderTagBar() {
+  const bar = document.getElementById('tag-bar');
+  bar.classList.add('visible');
+  bar.innerHTML = UNIQUE_TAGS.map(t =>
+    `<button class="tag-chip" onclick="insertTag('${t}')">${t}</button>`
+  ).join('');
+}
 
-      const time = document.createElement('div');
-      time.className = 'msg-time';
-      time.textContent = fmtTime(msg.ts);
-      wrap.appendChild(time);
+function insertTag(tag) {
+  const inp = document.getElementById('msg-input');
+  const cur = inp.value;
+  if (!cur.startsWith('#')) {
+    inp.value = tag + ' ' + cur;
+  } else {
+    inp.value = cur + ' ' + tag;
+  }
+  inp.focus();
+  onInputChange(inp);
+}
 
-      container.insertBefore(wrap, typing);
+function renderChat() {
+  const container = document.getElementById('chat-view');
+  const typing = document.getElementById('typing');
+  container.innerHTML = '';
+  container.appendChild(typing);
+  messages.forEach(msg => {
+    const wrap = document.createElement('div');
+    wrap.className = `msg-wrap ${msg.role}`;
+    if (msg.tag) {
+      const tl = document.createElement('div');
+      tl.className = 'msg-tag';
+      const typeInfo = msg.entryType ? TAGS[msg.entryType] : null;
+      tl.style.color = typeInfo ? typeInfo.color : '#888';
+      tl.textContent = (typeInfo ? typeInfo.icon + ' ' : '') + msg.tag;
+      wrap.appendChild(tl);
+    }
+    const bubble = document.createElement('div');
+    bubble.className = `msg-bubble ${msg.role}`;
+    bubble.textContent = msg.text;
+    wrap.appendChild(bubble);
+    const time = document.createElement('div');
+    time.className = 'msg-time';
+    time.textContent = fmtTime(msg.ts);
+    wrap.appendChild(time);
+    container.insertBefore(wrap, typing);
+  });
+  scrollBottom();
+}
+
+function scrollBottom() {
+  setTimeout(() => {
+    const c = document.getElementById('chat-view');
+    c.scrollTop = c.scrollHeight;
+  }, 50);
+}
+
+function onInputChange(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+  document.getElementById('send-btn').classList.toggle('ready', el.value.trim().length > 0);
+}
+
+function onKeyDown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+}
+
+async function send() {
+  const input = document.getElementById('msg-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = ''; input.style.height = 'auto';
+  document.getElementById('send-btn').classList.remove('ready');
+
+  messages.push({ id: Date.now(), role: 'user', text, ts: Date.now() });
+  renderChat();
+  document.getElementById('typing').classList.add('visible');
+  scrollBottom();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: text }],
+      }),
     });
+    const data = await res.json();
+    const raw = data.content?.find(b => b.type === 'text')?.text || '{}';
+    const p = JSON.parse(raw.replace(/```json|```/g,'').trim());
 
-    scrollBottom();
+    const entry = {
+      id: Date.now(),
+      type: p.type || 'nota',
+      tag: p.tag || '#outros',
+      title: p.title || text.slice(0,40),
+      summary: p.summary || text,
+      value: p.value || null,
+      date: p.date || null,
+      time: p.time || null,
+      ts: Date.now(),
+    };
+    entries.push(entry);
+    saveEntries();
+
+    messages.push({
+      id: Date.now()+1, role: 'assistant', ts: Date.now(),
+      text: p.reply || 'Anotado.',
+      tag: entry.tag, entryType: entry.type,
+    });
+  } catch(e) {
+    messages.push({ id: Date.now(), role: 'assistant', text: 'Erro ao processar. Tente novamente.', ts: Date.now() });
   }
 
-  function scrollBottom() {
-    setTimeout(() => {
-      const c = document.getElementById('chat-view');
-      c.scrollTop = c.scrollHeight;
-    }, 50);
-  }
+  document.getElementById('typing').classList.remove('visible');
+  renderChat();
+}
 
-  function onInputChange(el) {
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 100) + 'px';
-    const btn = document.getElementById('send-btn');
-    btn.classList.toggle('ready', el.value.trim().length > 0);
-  }
+// ── DASHBOARD ──
+function renderDashboard() {
+  const dash = document.getElementById('dashboard-view');
+  dash.innerHTML = '';
 
-  function onKeyDown(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      send();
-    }
-  }
+  // Today summary
+  const todayAll = entries.filter(e => new Date(e.ts).toISOString().split('T')[0] === todayStr());
+  const todayGastos = todayAll.filter(e => e.type === 'gasto');
+  const todayCreditos = todayAll.filter(e => e.type === 'credito');
+  const todayOthers = todayAll.filter(e => e.type !== 'gasto' && e.type !== 'credito');
+  const todayGastoTotal = todayGastos.reduce((s,e) => s+(e.value||0), 0);
+  const todayCreditoTotal = todayCreditos.reduce((s,e) => s+(e.value||0), 0);
 
-  async function send() {
-    const input = document.getElementById('msg-input');
-    const text = input.value.trim();
-    if (!text) return;
+  // Date
+  const dateEl = document.createElement('div');
+  dateEl.className = 'date-label';
+  dateEl.textContent = todayFullLabel();
+  dash.appendChild(dateEl);
 
-    input.value = '';
-    input.style.height = 'auto';
-    document.getElementById('send-btn').classList.remove('ready');
+  // Today card
+  const todayCard = document.createElement('div');
+  todayCard.className = 'today-summary';
+  let todayHTML = `
+    <div class="today-label">Resumo de hoje</div>
+    <div class="today-stats">
+      <div class="today-stat">Gastos <span>${fmt(todayGastoTotal)}</span></div>
+      ${todayCreditoTotal > 0 ? `<div class="today-stat">Créditos <span>${fmt(todayCreditoTotal)}</span></div>` : ''}
+      <div class="today-stat">Registros <span>${todayAll.length}</span></div>
+    </div>`;
 
-    const userMsg = { id: Date.now(), role: 'user', text, ts: Date.now() };
-    messages.push(userMsg);
-    renderChat();
-
-    document.getElementById('typing').classList.add('visible');
-    scrollBottom();
-
-    try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system: SYSTEM_PROMPT,
-          messages: [{ role: 'user', content: text }],
-        }),
-      });
-
-      const data = await res.json();
-      const raw = data.content?.find(b => b.type === 'text')?.text || '{}';
-      const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
-
-      const entry = {
-        id: Date.now(),
-        category: parsed.category || 'nota',
-        title: parsed.title || text.slice(0, 40),
-        summary: parsed.summary || text,
-        value: parsed.value || null,
-        date: parsed.date || null,
-        time: parsed.time || null,
-        ts: Date.now(),
-      };
-      entries.push(entry);
-      localStorage.setItem('camila_pa_entries', JSON.stringify(entries));
-
-      messages.push({
-        id: Date.now() + 1,
-        role: 'assistant',
-        text: parsed.reply || 'Anotado.',
-        category: entry.category,
-        ts: Date.now(),
-      });
-    } catch (e) {
-      messages.push({ id: Date.now(), role: 'assistant', text: 'Erro ao processar. Verifique sua conexão e tente novamente.', ts: Date.now() });
-    }
-
-    document.getElementById('typing').classList.remove('visible');
-    renderChat();
-  }
-
-  // ── DASHBOARD ──
-  function renderDashboard() {
-    const dash = document.getElementById('dashboard-view');
-    dash.innerHTML = '';
-
-    const todayEntries = entries.filter(e => new Date(e.ts).toISOString().split('T')[0] === todayStr());
-    const totalGastos = entries.filter(e => e.category === 'gasto').reduce((s, e) => s + (e.value || 0), 0);
-    const todayGastos = todayEntries.filter(e => e.category === 'gasto').reduce((s, e) => s + (e.value || 0), 0);
-    const todayGastoCount = todayEntries.filter(e => e.category === 'gasto').length;
-    const allGastoCount = entries.filter(e => e.category === 'gasto').length;
-    const compromissos = entries.filter(e => e.category === 'compromisso').sort((a, b) => (a.date || '').localeCompare(b.date || ''));
-    const notas = entries.filter(e => e.category === 'nota');
-    const insights = entries.filter(e => e.category === 'insight');
-
-    // Date label
-    dash.innerHTML += `<div class="date-label">${todayLabel()}</div>`;
-
-    // Finance cards
-    dash.innerHTML += `
-      <div class="cards-grid">
-        <div class="card">
-          <div class="card-label">Hoje</div>
-          <div class="card-value" style="color:${todayGastos > 0 ? '#c0392b' : '#1a1a1a'}">${fmt(todayGastos)}</div>
-          <div class="card-sub">${todayGastoCount} lançamento${todayGastoCount !== 1 ? 's' : ''}</div>
-        </div>
-        <div class="card">
-          <div class="card-label">Total</div>
-          <div class="card-value" style="color:${totalGastos > 0 ? '#c0392b' : '#1a1a1a'}">${fmt(totalGastos)}</div>
-          <div class="card-sub">${allGastoCount} registro${allGastoCount !== 1 ? 's' : ''}</div>
-        </div>
-      </div>`;
-
-    // Stats
-    dash.innerHTML += `
-      <div class="stats-grid">
-        <div class="stat-card"><div class="stat-num" style="color:#1a6b4a">${compromissos.length}</div><div class="stat-label">Compromissos</div></div>
-        <div class="stat-card"><div class="stat-num" style="color:#2c3e50">${notas.length}</div><div class="stat-label">Notas</div></div>
-        <div class="stat-card"><div class="stat-num" style="color:#8e6bbf">${insights.length}</div><div class="stat-label">Insights</div></div>
-      </div>`;
-
-    // Sections
-    if (compromissos.length > 0) dash.appendChild(buildSection('Próximos compromissos', '◷', '#1a6b4a', compromissos.slice(0, 5)));
-    if (todayEntries.filter(e => e.category === 'gasto').length > 0) dash.appendChild(buildSection('Gastos de hoje', '↓', '#c0392b', todayEntries.filter(e => e.category === 'gasto')));
-    if (notas.length > 0) dash.appendChild(buildSection('Notas recentes', '✎', '#2c3e50', notas.slice(-3).reverse()));
-    if (insights.length > 0) dash.appendChild(buildSection('Insights', '◈', '#8e6bbf', insights.slice(-3).reverse()));
-
-    if (entries.length === 0) {
-      dash.innerHTML += `
-        <div class="empty-state">
-          <div class="empty-icon">◌</div>
-          <div class="empty-text">Nenhum registro ainda.<br>Vá ao chat e comece a registrar.</div>
+  const allToday = [...todayAll].reverse().slice(0, 5);
+  if (allToday.length > 0) {
+    todayHTML += `<div class="today-entries">`;
+    allToday.forEach(e => {
+      const ti = TAGS[e.type];
+      let meta = e.value ? fmt(e.value) : (e.time || '');
+      todayHTML += `
+        <div class="today-entry-item">
+          <div class="today-entry-text">${ti ? ti.icon+' ' : ''}${e.title}</div>
+          <div class="today-entry-meta">${meta}</div>
         </div>`;
-    }
+    });
+    todayHTML += `</div>`;
+  } else {
+    todayHTML += `<div class="today-empty">Nenhum registro hoje ainda</div>`;
+  }
+  todayCard.innerHTML = todayHTML;
+  dash.appendChild(todayCard);
+
+  // Finance section
+  const finSection = document.createElement('div');
+  finSection.className = 'section';
+
+  // Month nav
+  const monthEntries = entries.filter(e => {
+    const d = new Date(e.ts);
+    return d.getMonth() === finMonth && d.getFullYear() === finYear;
+  });
+  const gastoEntries = monthEntries.filter(e => e.type === 'gasto');
+  const creditoEntries = monthEntries.filter(e => e.type === 'credito');
+  const totalGasto = gastoEntries.reduce((s,e) => s+(e.value||0), 0);
+  const totalCredito = creditoEntries.reduce((s,e) => s+(e.value||0), 0);
+  const saldo = totalCredito - totalGasto;
+
+  // Group by tag
+  const gastoByTag = {};
+  gastoEntries.forEach(e => { gastoByTag[e.tag] = (gastoByTag[e.tag]||0) + (e.value||0); });
+  const maxVal = Math.max(...Object.values(gastoByTag), 1);
+  const allGastoTags = ['todas', ...Object.keys(gastoByTag)];
+
+  finSection.innerHTML = `
+    <div class="section-header">
+      <div class="section-header-left">
+        <span class="section-icon" style="color:#c0392b">↓↑</span>
+        <span class="section-title">Finanças</span>
+      </div>
+      <div class="fin-month-nav">
+        <button class="fin-month-btn" onclick="changeMonth(-1)">‹</button>
+        <div class="fin-month-label">${monthName(finMonth)}</div>
+        <button class="fin-month-btn" onclick="changeMonth(1)">›</button>
+      </div>
+    </div>
+    <div style="padding:12px 16px">
+      <div class="fin-cards">
+        <div class="fin-card">
+          <div class="fin-card-label">Despesas</div>
+          <div class="fin-card-val" style="color:#c0392b">${fmt(totalGasto)}</div>
+        </div>
+        <div class="fin-card">
+          <div class="fin-card-label">Créditos</div>
+          <div class="fin-card-val" style="color:#1a6b4a">${fmt(totalCredito)}</div>
+        </div>
+        <div class="fin-card">
+          <div class="fin-card-label">Saldo</div>
+          <div class="fin-card-val" style="color:${saldo>=0?'#1a6b4a':'#c0392b'}">${fmt(saldo)}</div>
+        </div>
+      </div>
+      <div class="fin-cat-filter" id="fin-cat-filter">
+        ${allGastoTags.map(t => `<button class="fin-cat-chip ${finCatFilter===t?'active':''}" onclick="setFinCat('${t}')">${t}</button>`).join('')}
+      </div>
+      <div class="fin-chart" id="fin-chart">
+        ${Object.entries(gastoByTag)
+          .filter(([t]) => finCatFilter === 'todas' || t === finCatFilter)
+          .sort((a,b) => b[1]-a[1])
+          .map(([tag, val]) => `
+            <div class="fin-bar-row">
+              <div class="fin-bar-label">${tag}</div>
+              <div class="fin-bar-track"><div class="fin-bar-fill" style="width:${Math.round(val/maxVal*100)}%;background:#c0392b88"></div></div>
+              <div class="fin-bar-val">${fmt(val)}</div>
+            </div>`).join('') || '<div style="font-size:12px;color:#ccc;text-align:center;padding:12px">Sem gastos neste mês</div>'}
+      </div>
+    </div>`;
+  dash.appendChild(finSection);
+
+  // Compromissos próximos
+  const proxComp = entries.filter(e => e.type === 'compromisso' && e.date >= todayStr())
+    .sort((a,b) => (a.date||'').localeCompare(b.date||'')).slice(0,4);
+  if (proxComp.length > 0) {
+    dash.appendChild(buildSection('Próximos compromissos', '◷', '#1a6b4a', proxComp, false));
   }
 
-  function buildSection(title, icon, color, items) {
-    const sec = document.createElement('div');
-    sec.className = 'section';
-    sec.innerHTML = `
-      <div class="section-header">
+  // Insights recentes
+  const recInsights = entries.filter(e => e.type === 'insight').slice(-3).reverse();
+  if (recInsights.length > 0) {
+    dash.appendChild(buildSection('Insights recentes', '◈', '#8e6bbf', recInsights, false));
+  }
+
+  if (entries.length === 0) {
+    dash.innerHTML += `<div class="empty-state"><div class="empty-icon">◌</div><div class="empty-text">Nenhum registro ainda.<br>Vá ao chat e comece.</div></div>`;
+  }
+}
+
+function changeMonth(dir) {
+  finMonth += dir;
+  if (finMonth < 0) { finMonth = 11; finYear--; }
+  if (finMonth > 11) { finMonth = 0; finYear++; }
+  renderDashboard();
+}
+
+function setFinCat(cat) {
+  finCatFilter = cat;
+  renderDashboard();
+}
+
+function buildSection(title, icon, color, items, showFilter) {
+  const sec = document.createElement('div');
+  sec.className = 'section';
+  sec.innerHTML = `
+    <div class="section-header">
+      <div class="section-header-left">
         <span class="section-icon" style="color:${color}">${icon}</span>
         <span class="section-title">${title}</span>
-      </div>`;
-    items.forEach(e => {
-      const cat = CATEGORIES[e.category];
-      const row = document.createElement('div');
-      row.className = 'entry-row';
-      let rightHtml = '';
-      if (e.value) rightHtml = `<div class="entry-value">${fmt(e.value)}</div>`;
-      else if (e.date) rightHtml = `<div class="entry-date">${fmtDate(e.date)}${e.time ? ' · ' + e.time : ''}</div>`;
-      else rightHtml = `<div class="entry-icon" style="color:${cat.color}">${cat.icon}</div>`;
+      </div>
+    </div>`;
+  items.forEach(e => {
+    const row = document.createElement('div');
+    row.className = 'entry-row';
+    let rightHTML = '';
+    if (e.value) rightHTML = `<div class="entry-value" style="color:${e.type==='credito'?'#1a6b4a':'#c0392b'}">${fmt(e.value)}</div>`;
+    else if (e.date) rightHTML = `<div class="entry-date">${fmtDate(e.date)}${e.time?' · '+e.time:''}</div>`;
+    row.innerHTML = `
+      <div class="entry-left">
+        <div class="entry-title">${e.title}</div>
+        ${e.summary&&e.summary!==e.title?`<div class="entry-summary">${e.summary}</div>`:''}
+        <div class="entry-tag" style="color:${TAGS[e.type]?.color||'#888'}">${e.tag}</div>
+      </div>
+      <div class="entry-right">${rightHTML}</div>`;
+    sec.appendChild(row);
+  });
+  return sec;
+}
 
-      row.innerHTML = `
-        <div style="flex:1;min-width:0">
-          <div class="entry-title">${e.title}</div>
-          ${e.summary && e.summary !== e.title ? `<div class="entry-summary">${e.summary}</div>` : ''}
-        </div>
-        <div class="entry-right">${rightHtml}</div>`;
-      sec.appendChild(row);
-    });
-    return sec;
+// ── HISTORY ──
+function renderHistory() {
+  const hist = document.getElementById('history-view');
+  hist.innerHTML = '';
+
+  // Type filter
+  const typeBar = document.createElement('div');
+  typeBar.className = 'hist-type-bar hist-filter-bar';
+  const types = [['todos','Todos'],['gasto','Gastos'],['credito','Créditos'],['compromisso','Compromissos'],['insight','Insights'],['nota','Notas']];
+  typeBar.innerHTML = types.map(([v,l]) =>
+    `<button class="hist-chip ${histTypeFilter===v?'active':''}" onclick="setHistType('${v}')">${l}</button>`
+  ).join('');
+  hist.appendChild(typeBar);
+
+  // Tag filter (based on selected type)
+  const availTags = histTypeFilter === 'todos'
+    ? [...new Set(entries.map(e => e.tag))]
+    : [...new Set(entries.filter(e => e.type === histTypeFilter).map(e => e.tag))];
+
+  if (availTags.length > 0) {
+    const tagBar = document.createElement('div');
+    tagBar.className = 'hist-filter-bar';
+    tagBar.innerHTML = ['todas', ...availTags].map(t =>
+      `<button class="hist-chip ${histTagFilter===t?'active':''}" onclick="setHistTag('${t}')">${t}</button>`
+    ).join('');
+    hist.appendChild(tagBar);
   }
 
-  init();
+  // Filtered entries
+  let filtered = entries.filter(e => {
+    const typeOk = histTypeFilter === 'todos' || e.type === histTypeFilter;
+    const tagOk = histTagFilter === 'todas' || e.tag === histTagFilter;
+    return typeOk && tagOk;
+  }).reverse();
+
+  if (filtered.length === 0) {
+    hist.innerHTML += `<div class="empty-state"><div class="empty-icon">◌</div><div class="empty-text">Nenhum registro encontrado.</div></div>`;
+    return;
+  }
+
+  // Group by month
+  const groups = {};
+  filtered.forEach(e => {
+    const d = new Date(e.ts);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const label = `${monthName(d.getMonth())} ${d.getFullYear()}`;
+    if (!groups[key]) groups[key] = { label, items: [] };
+    groups[key].items.push(e);
+  });
+
+  Object.values(groups).forEach(group => {
+    const groupEl = document.createElement('div');
+    groupEl.innerHTML = `<div class="date-label" style="padding:4px 0 8px">${group.label}</div>`;
+    const sec = document.createElement('div');
+    sec.className = 'section';
+    group.items.forEach(e => {
+      const ti = TAGS[e.type];
+      const row = document.createElement('div');
+      row.className = 'entry-row';
+      let rightHTML = '';
+      if (e.value) rightHTML = `<div class="entry-value" style="color:${e.type==='credito'?'#1a6b4a':'#c0392b'}">${fmt(e.value)}</div>`;
+      else if (e.date) rightHTML = `<div class="entry-date">${fmtDate(e.date)}${e.time?' · '+e.time:''}</div>`;
+      else rightHTML = `<div style="font-size:11px;color:${ti?.color||'#888'}">${ti?.icon||''}</div>`;
+      row.innerHTML = `
+        <div class="entry-left">
+          <div class="entry-title">${e.title}</div>
+          ${e.summary&&e.summary!==e.title?`<div class="entry-summary">${e.summary}</div>`:''}
+          <div class="entry-tag" style="color:${ti?.color||'#888'}">${ti?.icon||''} ${e.tag}</div>
+        </div>
+        <div class="entry-right">${rightHTML}</div>`;
+      sec.appendChild(row);
+    });
+    groupEl.appendChild(sec);
+    hist.appendChild(groupEl);
+  });
+}
+
+function setHistType(t) { histTypeFilter = t; histTagFilter = 'todas'; renderHistory(); }
+function setHistTag(t) { histTagFilter = t; renderHistory(); }
+
+init();
 </script>
 </body>
 </html>
