@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-title" content="Camila's PA" />
+  <title>Camila's PA</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: #f8f6f2;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #app {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background: #f8f6f2;
+    }
+
+    /* ── HEADER ── */
+    #header {
+      background: #1a1a1a;
+      padding: 52px 20px 14px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    #header-title { color: #f8f6f2; font-size: 18px; font-weight: 400; letter-spacing: 0.04em; }
+    #header-sub { color: #888; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 2px; }
+
+    .tab-btn {
+      background: transparent;
+      color: #888;
+      border: 1px solid #444;
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+      margin-left: 6px;
+    }
+    .tab-btn.active {
+      background: #f8f6f2;
+      color: #1a1a1a;
+      border-color: #f8f6f2;
+    }
+
+    /* ── API KEY SCREEN ── */
+    #api-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      text-align: center;
+    }
+    #api-screen .icon { font-size: 36px; margin-bottom: 20px; color: #bbb; }
+    #api-screen h2 { font-size: 18px; font-weight: 400; color: #1a1a1a; margin-bottom: 10px; }
+    #api-screen p { font-size: 13px; color: #888; line-height: 1.6; margin-bottom: 24px; }
+    #api-screen a { color: #1a1a1a; }
+    #api-input {
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-family: monospace;
+      background: #fff;
+      color: #1a1a1a;
+      outline: none;
+      margin-bottom: 12px;
+    }
+    #api-save-btn {
+      width: 100%;
+      background: #1a1a1a;
+      color: #f8f6f2;
+      border: none;
+      border-radius: 12px;
+      padding: 13px;
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+    }
+    #api-note { font-size: 11px; color: #bbb; margin-top: 12px; line-height: 1.5; }
+
+    /* ── CHAT VIEW ── */
+    #chat-view {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 16px 110px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    #chat-view.hidden, #dashboard-view.hidden { display: none; }
+
+    .msg-wrap { display: flex; flex-direction: column; }
+    .msg-wrap.user { align-items: flex-end; }
+    .msg-wrap.assistant { align-items: flex-start; }
+
+    .msg-cat-label {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+      padding-left: 4px;
+    }
+
+    .msg-bubble {
+      border-radius: 18px;
+      padding: 10px 14px;
+      max-width: 80%;
+      font-size: 14px;
+      line-height: 1.5;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .msg-bubble.user {
+      background: #1a1a1a;
+      color: #f8f6f2;
+      border-radius: 18px 18px 4px 18px;
+    }
+    .msg-bubble.assistant {
+      background: #fff;
+      color: #1a1a1a;
+      border: 1px solid #eee;
+      border-radius: 18px 18px 18px 4px;
+    }
+
+    .msg-time {
+      font-size: 10px;
+      color: #bbb;
+      margin-top: 3px;
+      padding: 0 4px;
+    }
+
+    /* Typing indicator */
+    #typing {
+      display: none;
+      align-items: flex-start;
+    }
+    #typing.visible { display: flex; }
+    .typing-bubble {
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 18px 18px 18px 4px;
+      padding: 10px 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+    .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #ccc;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1); }
+    }
+
+    /* ── INPUT BAR ── */
+    #input-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      background: #fff;
+      border-top: 1px solid #eee;
+      padding: 12px 16px 28px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      z-index: 10;
+    }
+    #msg-input {
+      flex: 1;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      line-height: 1.4;
+      background: #f8f6f2;
+      color: #1a1a1a;
+      max-height: 100px;
+      overflow-y: auto;
+    }
+    #send-btn {
+      background: #ddd;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 16px;
+      cursor: default;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    #send-btn.ready {
+      background: #1a1a1a;
+      cursor: pointer;
+    }
+
+    /* ── DASHBOARD ── */
+    #dashboard-view {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 16px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .date-label {
+      font-size: 11px;
+      color: #999;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+    .card {
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 16px;
+      padding: 16px 18px;
+    }
+    .card-label {
+      font-size: 10px;
+      color: #999;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .card-value { font-size: 22px; font-weight: 400; }
+    .card-sub { font-size: 11px; color: #bbb; margin-top: 4px; }
+
+    .stat-card {
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 14px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+    .stat-num { font-size: 24px; font-weight: 400; }
+    .stat-label { font-size: 10px; color: #aaa; margin-top: 4px; letter-spacing: 0.08em; }
+
+    .section {
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .section-header {
+      padding: 12px 18px 10px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-icon { font-size: 13px; }
+    .section-title { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #888; }
+
+    .entry-row {
+      padding: 10px 18px;
+      border-bottom: 1px solid #fafafa;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .entry-row:last-child { border-bottom: none; }
+    .entry-title { font-size: 13px; color: #1a1a1a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .entry-summary { font-size: 11px; color: #aaa; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .entry-right { text-align: right; flex-shrink: 0; margin-left: 12px; }
+    .entry-value { font-size: 13px; color: #c0392b; }
+    .entry-date { font-size: 11px; color: #1a6b4a; }
+    .entry-icon { font-size: 10px; letter-spacing: 0.08em; }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #ccc;
+    }
+    .empty-icon { font-size: 32px; margin-bottom: 12px; }
+    .empty-text { font-size: 13px; letter-spacing: 0.06em; line-height: 1.6; }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <div id="header">
+    <div>
+      <div id="header-title">Camila's PA</div>
+      <div id="header-sub">Personal Assistant</div>
+    </div>
+    <div>
+      <button class="tab-btn active" onclick="switchView('chat')">Chat</button>
+      <button class="tab-btn" onclick="switchView('dashboard')">Painel</button>
+    </div>
+  </div>
+
+  <!-- API KEY SCREEN -->
+  <div id="api-screen" style="display:none;">
+    <div class="icon">⚿</div>
+    <h2>Configurar assistente</h2>
+    <p>Para funcionar, o app precisa da sua chave de API da Anthropic. Ela fica salva apenas no seu celular.<br><br>
+    Obtenha a sua em <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
+    <input type="password" id="api-input" placeholder="sk-ant-..." />
+    <button id="api-save-btn" onclick="saveApiKey()">Salvar e começar →</button>
+    <div id="api-note">A chave é armazenada localmente no seu dispositivo e nunca compartilhada.</div>
+  </div>
+
+  <!-- CHAT VIEW -->
+  <div id="chat-view" class="hidden">
+    <div id="typing">
+      <div class="typing-bubble">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD VIEW -->
+  <div id="dashboard-view" class="hidden">
+  </div>
+
+  <!-- INPUT BAR (only in chat) -->
+  <div id="input-bar" style="display:none;">
+    <textarea id="msg-input" rows="1" placeholder="Gastei 80 reais no jantar… reunião às 15h… percebi que…" oninput="onInputChange(this)" onkeydown="onKeyDown(event)"></textarea>
+    <button id="send-btn" onclick="send()">→</button>
+  </div>
+
+</div>
+
+<script>
+  const CATEGORIES = {
+    gasto:       { label: "Gasto",        color: "#c0392b", icon: "↓" },
+    nota:        { label: "Nota",         color: "#2c3e50", icon: "✎" },
+    insight:     { label: "Insight",      color: "#8e6bbf", icon: "◈" },
+    compromisso: { label: "Compromisso",  color: "#1a6b4a", icon: "◷" },
+  };
+
+  const SYSTEM_PROMPT = `Você é um assistente pessoal minimalista e inteligente chamado "Camila's Personal Assistant". Você processa mensagens curtas do usuário e classifica cada uma em uma das quatro categorias: gasto, nota, insight ou compromisso.
+
+Para cada mensagem, responda APENAS com JSON válido neste formato exato:
+{
+  "category": "gasto" | "nota" | "insight" | "compromisso",
+  "title": "título curto (máx 40 chars)",
+  "summary": "resumo em 1 linha",
+  "value": número ou null (apenas para gastos, em reais),
+  "date": "YYYY-MM-DD" ou null (apenas para compromissos),
+  "time": "HH:MM" ou null (apenas para compromissos),
+  "reply": "resposta natural e breve para o usuário (1-2 frases, tom direto e cálido)"
+}
+
+Exemplos:
+- "Gastei 45 reais no almoço" → category: gasto, value: 45
+- "Reunião com cliente sexta às 14h" → category: compromisso, date: próxima sexta, time: 14:00
+- "Preciso estudar mais sobre açúcar VHP" → category: nota
+- "Percebi que clientes do agro preferem contato direto" → category: insight
+
+Seja preciso na classificação. Nunca retorne texto fora do JSON.`;
+
+  let messages = [];
+  let entries = [];
+  let currentView = 'chat';
+  let apiKey = '';
+
+  function fmt(val) {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
+  }
+  function fmtTime(ts) {
+    return new Date(ts).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+  function fmtDate(d) {
+    if (!d) return '';
+    const [y, m, day] = d.split('-');
+    return `${day}/${m}`;
+  }
+  function todayStr() {
+    return new Date().toISOString().split('T')[0];
+  }
+  function todayLabel() {
+    return new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+
+  // ── INIT ──
+  function init() {
+    apiKey = localStorage.getItem('camila_pa_key') || '';
+    const savedEntries = localStorage.getItem('camila_pa_entries');
+    if (savedEntries) entries = JSON.parse(savedEntries);
+
+    if (!apiKey) {
+      document.getElementById('api-screen').style.display = 'flex';
+      document.getElementById('input-bar').style.display = 'none';
+    } else {
+      startApp();
+    }
+  }
+
+  function saveApiKey() {
+    const val = document.getElementById('api-input').value.trim();
+    if (!val.startsWith('sk-')) {
+      alert('Chave inválida. Deve começar com sk-ant-...');
+      return;
+    }
+    localStorage.setItem('camila_pa_key', val);
+    apiKey = val;
+    document.getElementById('api-screen').style.display = 'none';
+    startApp();
+  }
+
+  function startApp() {
+    addWelcome();
+    switchView('chat');
+    document.getElementById('input-bar').style.display = 'flex';
+  }
+
+  function addWelcome() {
+    if (messages.length === 0) {
+      messages.push({
+        id: 1,
+        role: 'assistant',
+        text: 'Olá, Camila! Sou seu assistente pessoal. Me conte seus gastos, compromissos, anotações ou insights — em linguagem natural, como você falaria no WhatsApp.',
+        ts: Date.now(),
+      });
+    }
+    renderChat();
+  }
+
+  // ── VIEWS ──
+  function switchView(view) {
+    currentView = view;
+    document.querySelectorAll('.tab-btn').forEach((b, i) => {
+      b.classList.toggle('active', (i === 0 && view === 'chat') || (i === 1 && view === 'dashboard'));
+    });
+    const chatEl = document.getElementById('chat-view');
+    const dashEl = document.getElementById('dashboard-view');
+    const inputEl = document.getElementById('input-bar');
+
+    if (view === 'chat') {
+      chatEl.classList.remove('hidden');
+      dashEl.classList.add('hidden');
+      inputEl.style.display = 'flex';
+      scrollBottom();
+    } else {
+      chatEl.classList.add('hidden');
+      dashEl.classList.remove('hidden');
+      inputEl.style.display = 'none';
+      renderDashboard();
+    }
+  }
+
+  // ── CHAT ──
+  function renderChat() {
+    const container = document.getElementById('chat-view');
+    // Clear existing messages (keep typing indicator)
+    const typing = document.getElementById('typing');
+    container.innerHTML = '';
+    container.appendChild(typing);
+
+    messages.forEach(msg => {
+      const wrap = document.createElement('div');
+      wrap.className = `msg-wrap ${msg.role}`;
+
+      if (msg.category) {
+        const cat = CATEGORIES[msg.category];
+        const label = document.createElement('div');
+        label.className = 'msg-cat-label';
+        label.style.color = cat.color;
+        label.textContent = `${cat.icon} ${cat.label}`;
+        wrap.appendChild(label);
+      }
+
+      const bubble = document.createElement('div');
+      bubble.className = `msg-bubble ${msg.role}`;
+      bubble.textContent = msg.text;
+      wrap.appendChild(bubble);
+
+      const time = document.createElement('div');
+      time.className = 'msg-time';
+      time.textContent = fmtTime(msg.ts);
+      wrap.appendChild(time);
+
+      container.insertBefore(wrap, typing);
+    });
+
+    scrollBottom();
+  }
+
+  function scrollBottom() {
+    setTimeout(() => {
+      const c = document.getElementById('chat-view');
+      c.scrollTop = c.scrollHeight;
+    }, 50);
+  }
+
+  function onInputChange(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+    const btn = document.getElementById('send-btn');
+    btn.classList.toggle('ready', el.value.trim().length > 0);
+  }
+
+  function onKeyDown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      send();
+    }
+  }
+
+  async function send() {
+    const input = document.getElementById('msg-input');
+    const text = input.value.trim();
+    if (!text) return;
+
+    input.value = '';
+    input.style.height = 'auto';
+    document.getElementById('send-btn').classList.remove('ready');
+
+    const userMsg = { id: Date.now(), role: 'user', text, ts: Date.now() };
+    messages.push(userMsg);
+    renderChat();
+
+    document.getElementById('typing').classList.add('visible');
+    scrollBottom();
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: SYSTEM_PROMPT,
+          messages: [{ role: 'user', content: text }],
+        }),
+      });
+
+      const data = await res.json();
+      const raw = data.content?.find(b => b.type === 'text')?.text || '{}';
+      const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+
+      const entry = {
+        id: Date.now(),
+        category: parsed.category || 'nota',
+        title: parsed.title || text.slice(0, 40),
+        summary: parsed.summary || text,
+        value: parsed.value || null,
+        date: parsed.date || null,
+        time: parsed.time || null,
+        ts: Date.now(),
+      };
+      entries.push(entry);
+      localStorage.setItem('camila_pa_entries', JSON.stringify(entries));
+
+      messages.push({
+        id: Date.now() + 1,
+        role: 'assistant',
+        text: parsed.reply || 'Anotado.',
+        category: entry.category,
+        ts: Date.now(),
+      });
+    } catch (e) {
+      messages.push({ id: Date.now(), role: 'assistant', text: 'Erro ao processar. Verifique sua conexão e tente novamente.', ts: Date.now() });
+    }
+
+    document.getElementById('typing').classList.remove('visible');
+    renderChat();
+  }
+
+  // ── DASHBOARD ──
+  function renderDashboard() {
+    const dash = document.getElementById('dashboard-view');
+    dash.innerHTML = '';
+
+    const todayEntries = entries.filter(e => new Date(e.ts).toISOString().split('T')[0] === todayStr());
+    const totalGastos = entries.filter(e => e.category === 'gasto').reduce((s, e) => s + (e.value || 0), 0);
+    const todayGastos = todayEntries.filter(e => e.category === 'gasto').reduce((s, e) => s + (e.value || 0), 0);
+    const todayGastoCount = todayEntries.filter(e => e.category === 'gasto').length;
+    const allGastoCount = entries.filter(e => e.category === 'gasto').length;
+    const compromissos = entries.filter(e => e.category === 'compromisso').sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+    const notas = entries.filter(e => e.category === 'nota');
+    const insights = entries.filter(e => e.category === 'insight');
+
+    // Date label
+    dash.innerHTML += `<div class="date-label">${todayLabel()}</div>`;
+
+    // Finance cards
+    dash.innerHTML += `
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-label">Hoje</div>
+          <div class="card-value" style="color:${todayGastos > 0 ? '#c0392b' : '#1a1a1a'}">${fmt(todayGastos)}</div>
+          <div class="card-sub">${todayGastoCount} lançamento${todayGastoCount !== 1 ? 's' : ''}</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Total</div>
+          <div class="card-value" style="color:${totalGastos > 0 ? '#c0392b' : '#1a1a1a'}">${fmt(totalGastos)}</div>
+          <div class="card-sub">${allGastoCount} registro${allGastoCount !== 1 ? 's' : ''}</div>
+        </div>
+      </div>`;
+
+    // Stats
+    dash.innerHTML += `
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-num" style="color:#1a6b4a">${compromissos.length}</div><div class="stat-label">Compromissos</div></div>
+        <div class="stat-card"><div class="stat-num" style="color:#2c3e50">${notas.length}</div><div class="stat-label">Notas</div></div>
+        <div class="stat-card"><div class="stat-num" style="color:#8e6bbf">${insights.length}</div><div class="stat-label">Insights</div></div>
+      </div>`;
+
+    // Sections
+    if (compromissos.length > 0) dash.appendChild(buildSection('Próximos compromissos', '◷', '#1a6b4a', compromissos.slice(0, 5)));
+    if (todayEntries.filter(e => e.category === 'gasto').length > 0) dash.appendChild(buildSection('Gastos de hoje', '↓', '#c0392b', todayEntries.filter(e => e.category === 'gasto')));
+    if (notas.length > 0) dash.appendChild(buildSection('Notas recentes', '✎', '#2c3e50', notas.slice(-3).reverse()));
+    if (insights.length > 0) dash.appendChild(buildSection('Insights', '◈', '#8e6bbf', insights.slice(-3).reverse()));
+
+    if (entries.length === 0) {
+      dash.innerHTML += `
+        <div class="empty-state">
+          <div class="empty-icon">◌</div>
+          <div class="empty-text">Nenhum registro ainda.<br>Vá ao chat e comece a registrar.</div>
+        </div>`;
+    }
+  }
+
+  function buildSection(title, icon, color, items) {
+    const sec = document.createElement('div');
+    sec.className = 'section';
+    sec.innerHTML = `
+      <div class="section-header">
+        <span class="section-icon" style="color:${color}">${icon}</span>
+        <span class="section-title">${title}</span>
+      </div>`;
+    items.forEach(e => {
+      const cat = CATEGORIES[e.category];
+      const row = document.createElement('div');
+      row.className = 'entry-row';
+      let rightHtml = '';
+      if (e.value) rightHtml = `<div class="entry-value">${fmt(e.value)}</div>`;
+      else if (e.date) rightHtml = `<div class="entry-date">${fmtDate(e.date)}${e.time ? ' · ' + e.time : ''}</div>`;
+      else rightHtml = `<div class="entry-icon" style="color:${cat.color}">${cat.icon}</div>`;
+
+      row.innerHTML = `
+        <div style="flex:1;min-width:0">
+          <div class="entry-title">${e.title}</div>
+          ${e.summary && e.summary !== e.title ? `<div class="entry-summary">${e.summary}</div>` : ''}
+        </div>
+        <div class="entry-right">${rightHtml}</div>`;
+      sec.appendChild(row);
+    });
+    return sec;
+  }
+
+  init();
+</script>
+</body>
+</html>
